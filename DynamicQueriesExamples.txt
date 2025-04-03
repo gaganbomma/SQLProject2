@@ -1,0 +1,135 @@
+---------------Basic Example ------------
+
+DECLARE @Title NVARCHAR(50) = 'The Godfather''; DROP TABLE Distributor; --';
+
+DECLARE @Title NVARCHAR(50) = 'The Godfather';
+DECLARE @SqlQuery NVARCHAR(MAX);
+
+SET @SqlQuery = '
+    SELECT *
+    FROM Movies
+    WHERE title = @TitleParam';
+
+PRINT @SqlQuery; -- Print the SQL query text before parameter assignment
+--EXEC sp_executesql @SqlQuery;
+--''' + @@Title + '''
+EXEC sp_executesql @SqlQuery, 
+                   N'@TitleParam NVARCHAR(50)', 
+                   @TitleParam = @Title;
+
+
+
+
+--- Dynamic Search Queries Best Example
+
+DECLARE @TitleKeyword NVARCHAR(100) = 'The';
+DECLARE @GenreID INT = 1; -- Action genre
+DECLARE @ReleaseYear INT = 1994;
+
+
+DECLARE @SQLQuery NVARCHAR(MAX);
+SET @SQLQuery = 'SELECT Title, ReleaseDate
+                 FROM Movies
+                 WHERE 1 = 1';  -- Dummy condition
+
+IF @TitleKeyword IS NOT NULL
+    SET @SQLQuery = @SQLQuery + ' AND Title LIKE ''%'' + @TitleKeyword + ''%''';
+
+IF @GenreID IS NOT NULL
+    SET @SQLQuery = @SQLQuery + ' AND GenreID = @GenreID';
+
+IF @ReleaseYear IS NOT NULL
+    SET @SQLQuery = @SQLQuery + ' AND YEAR(ReleaseDate) = @ReleaseYear';
+
+
+
+-- Execute the dynamic SQL query with parameters
+EXEC sp_executesql @SQLQuery,
+                   N'@TitleKeyword NVARCHAR(100), @GenreID INT, @ReleaseYear INT',
+                   @TitleKeyword = @TitleKeyword,
+                   @GenreID = @GenreID,
+                   @ReleaseYear = @ReleaseYear;
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-----------  Customized Reporting: These queries generate reports based on user-selected fields, filters, and sorting options. ------------------------
+
+DECLARE @SelectedFields NVARCHAR(MAX) = 'Title, ReleaseDate';
+DECLARE @SortField NVARCHAR(50) = 'ReleaseDate';
+DECLARE @SortDirection NVARCHAR(10) = 'DESC';
+
+DECLARE @SQLQuery NVARCHAR(MAX);
+SET @SQLQuery = 'SELECT ' + @SelectedFields + '
+                 FROM Movies
+                 ORDER BY ' + @SortField + ' ' + @SortDirection;
+
+EXEC sp_executesql @SQLQuery;
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+----------------Conditional Logic: These queries adjust their logic based on runtime conditions. ---------------------------
+
+DECLARE @FilterByReleaseYear BIT = 1;
+DECLARE @ReleaseYear INT = 1994;
+
+DECLARE @SQLQuery NVARCHAR(MAX);
+DECLARE @Params NVARCHAR(MAX);
+
+-- Construct the base SQL query
+SET @SQLQuery = 'SELECT Title, ReleaseDate
+                 FROM Movies
+                 WHERE 1 = 1'; -- Dummy condition
+
+-- Define parameters
+SET @Params = N'@ReleaseYear INT';
+
+-- Add the condition for filtering by release year if @FilterByReleaseYear is set
+IF @FilterByReleaseYear = 1
+    SET @SQLQuery = @SQLQuery + ' AND YEAR(ReleaseDate) = @ReleaseYear';
+
+-- Execute the dynamic SQL query with parameters
+EXEC sp_executesql @SQLQuery, @Params, @ReleaseYear = @ReleaseYear;
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------Dynamic Table or Column Names: These queries handle scenarios where table or column names are not known beforehand. -------
+
+
+DECLARE @TableName NVARCHAR(50) = 'Movies';
+DECLARE @ColumnName NVARCHAR(50) = 'Title';
+
+DECLARE @SQLQuery NVARCHAR(MAX);
+SET @SQLQuery = 'SELECT ' + @ColumnName + ' FROM ' + @TableName;
+
+EXEC sp_executesql @SQLQuery;
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+CREATE TABLE Distributor (
+    DistributorID INT PRIMARY KEY,
+    DistributorName NVARCHAR(100),
+    Location NVARCHAR(100)
+);
+
+INSERT INTO Distributor (DistributorID, DistributorName, Location)
+VALUES (1, 'ABC Distributors', 'New York'),
+       (2, 'XYZ Distributors', 'Los Angeles'),
+       (3, '123 Distributors', 'Chicago');
+
+
+---------------------------------------------------------------------------------
+
+In SQL Server, the N prefix is used to indicate that the subsequent string is in Unicode format (UTF-16). Unicode strings are useful when dealing with characters outside the ASCII range, such as characters from languages like Chinese, Japanese, or Arabic.
+
+In the context of the sp_executesql procedure, the N prefix is used to declare a Unicode string parameter. When passing parameters to dynamic SQL queries, it's important to specify the correct data type for each parameter. If you're passing string parameters, especially if they contain non-ASCII characters, it's best practice to use the N prefix to ensure proper handling of Unicode characters.
+
+Non-ASCII characters include characters from other writing systems, such as accented Latin characters (e.g., é, ç), characters from non-Latin scripts (e.g., 漢字), mathematical symbols (e.g., ∑, √), and special symbols (e.g., ©, ®).
