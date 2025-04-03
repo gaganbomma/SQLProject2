@@ -1,0 +1,52 @@
+--------------------
+
+CREATE FUNCTION GetDirectorFullName (@DirectorID INT)
+RETURNS NVARCHAR(100)
+AS
+BEGIN
+    DECLARE @FullName NVARCHAR(100);
+
+    SELECT @FullName = FirstName + ' ' + LastName
+    FROM Directors
+    WHERE DirectorID = @DirectorID;
+
+    RETURN @FullName;
+END;
+
+
+SELECT dbo.GetDirectorFullName(4);
+
+
+-----------------------------------------------------------------------------
+
+CREATE FUNCTION dbo.GetMovieAge (@ReleaseDate DATE)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @MovieAge INT;
+    SET @MovieAge = DATEDIFF(YEAR, @ReleaseDate, GETDATE());
+    RETURN @MovieAge;
+END;
+
+
+SELECT Title, dbo.GetMovieAge(ReleaseDate) AS Age
+FROM Movies;
+
+-------------------------------------------------------
+
+----------Inline Table-Valued Functions (TVFs): ---------------
+
+CREATE FUNCTION GetMoviesByReleaseYear (@ReleaseYear INT)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT Title, ReleaseDate
+    FROM Movies
+    WHERE YEAR(ReleaseDate) = @ReleaseYear
+);
+
+
+SELECT *
+FROM dbo.GetMoviesByReleaseYear(1994);
+-------------------------------------------------------------------------------
+

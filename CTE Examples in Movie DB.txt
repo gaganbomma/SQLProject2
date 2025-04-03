@@ -1,0 +1,30 @@
+-------Find Directors Who Have Directed More Than One Movie--------
+
+
+WITH DirectorMovieCount AS (
+    SELECT DirectorID, COUNT(*) AS MovieCount
+    FROM Movies
+    GROUP BY DirectorID
+)
+SELECT d.FirstName, d.LastName
+FROM Directors d
+JOIN DirectorMovieCount mc ON d.DirectorID = mc.DirectorID
+WHERE mc.MovieCount > 1;
+
+-------------------------------------------------
+
+------------------ Update the release year of movies directed by a specific director to a new year --------------
+
+
+WITH DirectorMovies AS (
+    SELECT MovieID
+    FROM Movies
+    WHERE DirectorID = (SELECT DirectorID FROM Directors WHERE FirstName = 'Christopher' AND LastName = 'Nolan')
+)
+UPDATE Movies
+SET ReleaseDate = DATEADD(YEAR, 1, ReleaseDate) -- Increment release year by 1
+WHERE MovieID IN (SELECT MovieID FROM DirectorMovies);
+
+
+
+------------------------------------------------------------------------------------------------------------------

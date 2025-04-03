@@ -1,0 +1,32 @@
+SELECT 
+    MovieID, 
+    Title, 
+    ReleaseDate, 
+    (SELECT GenreName FROM Genres WHERE Genres.GenreID = Movies.GenreID) AS Genre
+FROM 
+    Movies;
+
+
+------------------------
+
+DELETE FROM Movies
+WHERE MovieID IN (SELECT MovieID FROM Reviews WHERE Rating < 3.0);
+
+
+--------------------------------
+
+SELECT g.GenreName, 
+       (SELECT COUNT(*) FROM Movies m WHERE m.GenreID = g.GenreID) AS NumMovies
+FROM Genres g;
+
+
+-----------------------------
+
+
+SELECT d.FirstName, d.LastName, 
+       (SELECT STRING_AGG(m.Title, ', ') 
+        FROM Movies m 
+        WHERE m.DirectorID = d.DirectorID) AS DirectedMovies
+FROM Directors d;
+
+

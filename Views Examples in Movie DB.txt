@@ -1,0 +1,39 @@
+CREATE VIEW MovieDetailsView AS
+SELECT m.Title AS MovieTitle, m.ReleaseDate, d.FirstName + ' ' + d.LastName AS DirectorName, g.GenreName
+FROM Movies m
+JOIN Directors d ON m.DirectorID = d.DirectorID
+JOIN Genres g ON m.GenreID = g.GenreID;
+
+SELECT * FROM MovieDetailsView;
+
+
+---------------------------------------------------------------------------
+
+
+CREATE VIEW HideColumnsMoviesView AS
+SELECT MovieID, title from Movies;
+
+SELECT * FROM HideColumnsMoviesView;
+--------------------------------------------------
+
+
+CREATE VIEW MovieReviewStats AS
+SELECT m.MovieID, COUNT(r.ReviewID) AS TotalReviews, AVG(r.Rating) AS AvgRating
+FROM Movies m
+ JOIN Reviews r ON m.MovieID = r.MovieID
+GROUP BY m.MovieID;
+
+
+
+SELECT m.Title, s.TotalReviews, s.AvgRating
+FROM Movies m
+JOIN MovieReviewStats s ON m.MovieID = s.MovieID;
+
+
+insert into Reviews values(6,3,4,2.1,'Below Average', '2024-03-07')
+insert into Reviews values(7,3,2,3.1,'Average', '2024-03-08')
+
+
+By using the MovieReviewStats materialized view, we avoid the need to perform the aggregation on the Reviews table every time we query movie details. Instead, the aggregates are pre-computed and stored in the materialized view, improving query performance.
+
+----------------------------------------------------------------------------

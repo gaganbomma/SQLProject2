@@ -1,0 +1,131 @@
+CREATE TABLE Genres (
+    GenreID INT PRIMARY KEY,
+    GenreName VARCHAR(50)
+);
+
+INSERT INTO Genres (GenreID, GenreName)
+VALUES 
+    (1, 'Drama'),
+    (2, 'Crime'),
+    (3, 'Action'),
+    (4, 'Thriller'),
+    (5, 'Comedy');
+
+
+-------------------------------------------------
+
+
+CREATE TABLE Directors (
+    DirectorID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50)
+);
+
+INSERT INTO Directors (DirectorID, FirstName, LastName)
+VALUES 
+    (1, 'Frank', 'Darabont'),
+    (2, 'Francis Ford', 'Coppola'),
+    (3, 'Christopher', 'Nolan'),
+    (4, 'Quentin', 'Tarantino'),
+    (5, 'Robert', 'Zemeckis');
+
+----------------------------------------------------------
+
+CREATE TABLE Movies (
+    MovieID INT PRIMARY KEY,
+    Title VARCHAR(100),
+    ReleaseDate DATE,
+    GenreID INT,
+    DirectorID INT,
+    FOREIGN KEY (GenreID) REFERENCES Genres(GenreID),
+    FOREIGN KEY (DirectorID) REFERENCES Directors(DirectorID)
+);
+
+INSERT INTO Movies (MovieID, Title, ReleaseDate, GenreID, DirectorID)
+VALUES 
+    (1, 'The Shawshank Redemption', '1994-10-14', 1, 1),
+    (2, 'The Godfather', '1972-03-24', 2, 2),
+    (3, 'The Dark Knight', '2008-07-18', 3, 3),
+    (4, 'Pulp Fiction', '1994-10-14', 4, 4),
+    (5, 'Forrest Gump', '1994-07-06', 5, 5);
+
+
+------------------------------------------------------------------
+
+CREATE TABLE Actors (
+    ActorID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50)
+);
+
+INSERT INTO Actors (ActorID, FirstName, LastName)
+VALUES 
+    (1, 'Tim', 'Robbins'),
+    (2, 'Marlon', 'Brando'),
+    (3, 'Heath', 'Ledger'),
+    (4, 'John', 'Travolta'),
+    (5, 'Tom', 'Hanks');
+
+------------------------------------------------
+
+
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY,
+    UserName VARCHAR(50),
+    Email VARCHAR(100),
+    Password VARCHAR(50)
+);
+
+INSERT INTO Users (UserID, UserName, Email, Password)
+VALUES 
+    (1, 'user1', 'user1@example.com', 'password1'),
+    (2, 'user2', 'user2@example.com', 'password2'),
+    (3, 'user3', 'user3@example.com', 'password3'),
+    (4, 'user4', 'user4@example.com', 'password4'),
+    (5, 'user5', 'user5@example.com', 'password5');
+
+
+---------------------------------------------------------
+
+CREATE TABLE Reviews (
+    ReviewID INT PRIMARY KEY,
+    MovieID INT,
+    UserID INT,
+    Rating FLOAT,
+    ReviewText TEXT,
+    ReviewDate DATE,
+    FOREIGN KEY (MovieID) REFERENCES Movies(MovieID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+INSERT INTO Reviews (ReviewID, MovieID, UserID, Rating, ReviewText, ReviewDate)
+VALUES 
+    (1, 1, 1, 4.5, 'An amazing movie!', '2024-03-09'),
+    (2, 2, 2, 5.0, 'A classic masterpiece!', '2024-03-08'),
+    (3, 3, 3, 4.8, 'One of the best superhero movies!', '2024-03-07'),
+    (4, 4, 4, 4.2, 'Great story and characters.', '2024-03-06'),
+    (5, 5, 5, 4.7, 'Heartwarming and inspiring.', '2024-03-05');
+
+
+-------------------------------
+
+CREATE TABLE MovieActors (
+    MovieID INT,
+    ActorID INT,
+    PRIMARY KEY (MovieID, ActorID),
+    FOREIGN KEY (MovieID) REFERENCES Movies(MovieID),
+    FOREIGN KEY (ActorID) REFERENCES Actors(ActorID)
+);
+
+----------------------------------
+
+-- Inserting sample data into the MovieActors table
+INSERT INTO MovieActors (MovieID, ActorID) VALUES
+    (1, 1), -- The Shawshank Redemption - Tim Robbins
+    (2, 2), -- The Godfather - Marlon Brando
+    (3, 3), -- The Dark Knight - Heath Ledger
+    (4, 4), -- Pulp Fiction - John Travolta
+    (5, 5); -- Forrest Gump - Tom Hanks
+
+----------------------------------------------------
+
